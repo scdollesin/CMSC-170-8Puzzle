@@ -42,16 +42,17 @@ public class GameStage {
 	private final Image bg = new Image("assets/background1.png",WINDOW_WIDTH,WINDOW_HEIGHT,false,false);
 	
 	
-	public GameStage() {
+	public GameStage(ArrayList<Integer> input) {
 		this.root = new Group();
 		this.scene = new Scene(root, GameStage.WINDOW_WIDTH,GameStage.WINDOW_HEIGHT,Color.WHITE);
 		this.canvas = new Canvas(GameStage.WINDOW_WIDTH,GameStage.WINDOW_HEIGHT);
 		this.gc = canvas.getGraphicsContext2D();
 		this.board = new GridPane();
 		this.tiles = new ArrayList<Tile>();
-		this.input = new ArrayList<Integer>();
-		//TODO: remove hard-coded input
-		for (int x = 0; x < MAX_CELLS; x++) input.add(x+1);
+		this.input = input;
+//		this.input = new ArrayList<Integer>();
+//		//TODO: remove hard-coded input
+//		for (int x = 0; x < MAX_CELLS; x++) input.add(x+1);
 		setProperties();
 	}
 	
@@ -63,8 +64,6 @@ public class GameStage {
 	}
 	
 	private void createBoard(){
-		System.out.println("creating board...");
-
 		int tiles_created = 0;
 		//create 9 tiles
 		for(int i=0;i<GameStage.BOARD_NUM_ROWS;i++){
@@ -77,7 +76,7 @@ public class GameStage {
 
 				//add each tile to the array list tiles
 				this.tiles.add(newTile);
-				System.out.println("> tile " + tiles_created + " created. " + "["+i+","+j+"]");
+//				System.out.println("> tile " + tiles_created + " created. " + "["+i+","+j+"]");
 
 			}
 		}

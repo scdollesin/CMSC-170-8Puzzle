@@ -28,16 +28,16 @@ public class Tile {
 		//TODO: remove print statements
 		// load image depending on the number designated to this tile
 		switch(this.number) {
-			case 1: this.img = ONE_IMAGE; System.out.println("1"); break;
-			case 2: this.img = TWO_IMAGE; System.out.println("2"); break;
-			case 3: this.img = THREE_IMAGE; System.out.println("3"); break;
-			case 4: this.img = FOUR_IMAGE; System.out.println("4"); break;
-			case 5: this.img = FIVE_IMAGE; System.out.println("5"); break;
-			case 6: this.img = SIX_IMAGE; System.out.println("6"); break;
-			case 7: this.img = SEVEN_IMAGE; System.out.println("7"); break;
-			case 8: this.img = EIGHT_IMAGE; System.out.println("8"); break;
-			case 9: this.img = NINE_IMAGE; System.out.println("9"); break;
-			default: System.out.println("ERROR: INVALID TILE NUMBER"); break;
+			case 1: this.img = ONE_IMAGE; break;
+			case 2: this.img = TWO_IMAGE; break;
+			case 3: this.img = THREE_IMAGE; break;
+			case 4: this.img = FOUR_IMAGE; break;
+			case 5: this.img = FIVE_IMAGE; break;
+			case 6: this.img = SIX_IMAGE; break;
+			case 7: this.img = SEVEN_IMAGE; break;
+			case 8: this.img = EIGHT_IMAGE; break;
+			case 0: this.img = NINE_IMAGE; break;
+			default: System.out.println("ERROR: Input contains an invalid number."); System.exit(0);
 		}
 		
 		this.setImageView();
