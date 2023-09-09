@@ -1,6 +1,7 @@
 package stages;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 
 import components.Tile;
@@ -24,6 +25,7 @@ public class GameStage {
 	private static ArrayList<Tile> tiles;
 	private ArrayList<Integer> input;
 	private static int zeroIndex;
+	public static final ArrayList<Integer> WIN_CONDITION = new ArrayList<Integer>(Arrays.asList(1,2,3,4,5,6,7,8,0));
     
 	// Window Dimensions
 	public static final int WINDOW_WIDTH = 720;
@@ -39,7 +41,7 @@ public class GameStage {
 	public final static double TILE_WIDTH = BOARD_WIDTH/3;
 	public final static double TILE_HEIGHT = BOARD_WIDTH/3;
 	
-	private final boolean IS_GAME_DONE = false;
+	public static boolean gameDone = false;
 	
 	private final Image bg = new Image("assets/background1.png",WINDOW_WIDTH,WINDOW_HEIGHT,false,false);
 	
@@ -112,6 +114,19 @@ public class GameStage {
 		//refresh the board
 		board.getChildren().clear();
 		addTiles();
+		//check for winning condition
+		checkBoard();
+	}
+	
+	private static void checkBoard(){
+		ArrayList<Integer> current = new ArrayList<Integer>();
+		for (Tile tile: tiles) {
+			current.add(tile.getNumber());
+		}
+		if (current.equals(WIN_CONDITION)){
+			gameDone = true;
+			System.out.println(">>>>>>> YOU WIN! <<<<<<<<");
+		}
 	}
 	
 	// Get the game's screen.

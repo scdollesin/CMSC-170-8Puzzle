@@ -41,7 +41,7 @@ public class Tile {
 		}
 		
 		this.setImageView();
-		this.setMouseHandler();
+		this.setMouseHandlers();
 	}
 	
 	public int getNumber() {
@@ -63,9 +63,14 @@ public class Tile {
 	}
 
 	
-	private void setMouseHandler(){
-		this.imgView.setOnMouseClicked(event -> {
-			GameStage.swapTiles(this);
-		});
+	private void setMouseHandlers(){
+		// swap tile clicked with empty tile
+		if (this.number!=0) {
+			this.imgView.setOnMouseClicked(event -> {
+				if (!GameStage.gameDone) {
+					GameStage.swapTiles(this);
+				}
+			});
+		}
 	}
 }
