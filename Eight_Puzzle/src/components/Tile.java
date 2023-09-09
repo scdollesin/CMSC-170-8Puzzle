@@ -1,15 +1,15 @@
 package components;
 
 import stages.GameStage;
-
+import application.Main;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
 public class Tile {
 	private int number;
+	public int index;
 	protected Image img;
 	protected ImageView imgView;
-	protected int row, col;
 	
 	public final static Image ONE_IMAGE = new Image("assets/one.png",GameStage.TILE_WIDTH,GameStage.TILE_WIDTH,false,false);
 	public final static Image TWO_IMAGE = new Image("assets/two.png",GameStage.TILE_WIDTH,GameStage.TILE_WIDTH,false,false);
@@ -22,10 +22,10 @@ public class Tile {
 	public final static Image NINE_IMAGE = new Image("assets/nine.png",GameStage.TILE_WIDTH,GameStage.TILE_WIDTH,false,false);
 	
 	
-	public Tile(int number){
+	public Tile(int number, int index){
 		this.number = number;
-		
-		//TODO: remove print statements
+		this.index = index;
+
 		// load image depending on the number designated to this tile
 		switch(this.number) {
 			case 1: this.img = ONE_IMAGE; break;
@@ -44,17 +44,8 @@ public class Tile {
 		this.setMouseHandler();
 	}
 	
-	public void initRowCol(int i, int j) {
-		this.row = i;
-		this.col = j;
-	}
-	
-	public int getRow() {
-		return this.row;
-	}
-	
-	public int getCol() {
-		return this.col;
+	public int getNumber() {
+		return this.number;
 	}
 	
 	private void setImageView() {
@@ -73,5 +64,8 @@ public class Tile {
 
 	
 	private void setMouseHandler(){
+		this.imgView.setOnMouseClicked(event -> {
+			GameStage.swapTiles(this);
+		});
 	}
 }

@@ -1,6 +1,7 @@
 package stages;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 import components.Tile;
 import javafx.scene.Group;
@@ -19,9 +20,10 @@ public class GameStage {
     private Group root;
     private Canvas canvas;
     private GraphicsContext gc;
-    private GridPane board;
-	private ArrayList<Tile> tiles;
+    private static GridPane board;
+	private static ArrayList<Tile> tiles;
 	private ArrayList<Integer> input;
+	private static int zeroIndex;
     
 	// Window Dimensions
 	public static final int WINDOW_WIDTH = 720;
@@ -47,12 +49,10 @@ public class GameStage {
 		this.scene = new Scene(root, GameStage.WINDOW_WIDTH,GameStage.WINDOW_HEIGHT,Color.WHITE);
 		this.canvas = new Canvas(GameStage.WINDOW_WIDTH,GameStage.WINDOW_HEIGHT);
 		this.gc = canvas.getGraphicsContext2D();
-		this.board = new GridPane();
-		this.tiles = new ArrayList<Tile>();
+		board = new GridPane();
+		tiles = new ArrayList<Tile>();
 		this.input = input;
-//		this.input = new ArrayList<Integer>();
-//		//TODO: remove hard-coded input
-//		for (int x = 0; x < MAX_CELLS; x++) input.add(x+1);
+		
 		setProperties();
 	}
 	
@@ -64,33 +64,54 @@ public class GameStage {
 	}
 	
 	private void createBoard(){
+		board.setPrefSize(GameStage.BOARD_WIDTH, GameStage.BOARD_HEIGHT);
+		//set the map to x and y location; add border color
+	    board.setStyle("-fx-border-color: white ;");
+		board.setLayoutX(GameStage.BOARD_WIDTH*0.07);
+	    board.setLayoutY(GameStage.BOARD_WIDTH*0.07);
+		
 		int tiles_created = 0;
+		
 		//create 9 tiles
+		for(int i=0; i<MAX_CELLS; i++) {
+			// Instantiate tile elements
+			int tile_number = this.input.get(tiles_created);
+			Tile newTile = new Tile(tile_number, tiles_created);
+			if (tile_number == 0) zeroIndex = tiles_created;
+
+			tiles_created++;
+
+			//add each tile to the array list tiles
+			tiles.add(newTile);
+		}
+	    
+	    addTiles();
+	}
+	
+	private static void addTiles(){
+	    //add each tile element to the board
+		int t = 0;
 		for(int i=0;i<GameStage.BOARD_NUM_ROWS;i++){
 			for(int j=0;j<GameStage.BOARD_NUM_COLS;j++){
-				
-				// Instantiate tile elements
-				Tile newTile = new Tile(this.input.get(tiles_created));
-				newTile.initRowCol(i,j);
-				tiles_created++;
-
-				//add each tile to the array list tiles
-				this.tiles.add(newTile);
-//				System.out.println("> tile " + tiles_created + " created. " + "["+i+","+j+"]");
-
+				Tile tile = tiles.get(t++);
+				board.add(tile.getImageView(), j, i);
+				if (tile.getNumber() == 0) {
+					
+				}
 			}
 		}
-
-		this.board.setPrefSize(GameStage.BOARD_WIDTH, GameStage.BOARD_HEIGHT);
-		//set the map to x and y location; add border color
-	    this.board.setStyle("-fx-border-color: white ;");
-		this.board.setLayoutX(GameStage.BOARD_WIDTH*0.07);
-	    this.board.setLayoutY(GameStage.BOARD_WIDTH*0.07);
-
-	    //add each tile element to the board
-		for(Tile tile: tiles){
-		    this.board.add(tile.getImageView(), tile.getCol(), tile.getRow());
-		}
+	}
+	
+	public static void swapTiles(Tile clicked){
+		Collections.swap(tiles, zeroIndex, clicked.index);
+		System.out.println("Swapped indexes: " + zeroIndex + " " + clicked.index);
+		int temp = zeroIndex;
+		zeroIndex = clicked.index;
+		clicked.index = temp;
+		
+		//refresh the board
+		board.getChildren().clear();
+		addTiles();
 	}
 	
 	// Get the game's screen.
