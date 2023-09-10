@@ -1,7 +1,6 @@
 package components;
 
 import stages.GameStage;
-import application.Main;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 

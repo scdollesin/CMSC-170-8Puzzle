@@ -62,8 +62,9 @@ public class GameStage {
 		this.input = input;
 		
 		setProperties();
-		checkBoard();	//checks if input is already arranged in the right order
+		checkWin();	//checks if input is already arranged in the right order
 		//TODO: check if solvable
+		checkIfSolvable();
 	}
 	
 	//method to initialize the scene elements
@@ -77,7 +78,7 @@ public class GameStage {
 		
 		this.gc.drawImage(this.bg, 0, 0);
 		this.createBoard();
-		this.root.getChildren().addAll(canvas, board);
+		root.getChildren().addAll(canvas, board);
 	}
 	
 	private void createBoard(){
@@ -112,9 +113,6 @@ public class GameStage {
 			for(int j=0;j<GameStage.BOARD_NUM_COLS;j++){
 				Tile tile = tiles.get(t++);
 				board.add(tile.getImageView(), j, i);
-				if (tile.getNumber() == 0) {
-					
-				}
 			}
 		}
 	}
@@ -130,10 +128,10 @@ public class GameStage {
 		board.getChildren().clear();
 		addTiles();
 		//check for winning condition
-		checkBoard();
+		checkWin();
 	}
 	
-	private static void checkBoard(){
+	private static void checkWin(){
 		ArrayList<Integer> current = new ArrayList<Integer>();
 		for (Tile tile: tiles) {
 			current.add(tile.getNumber());
@@ -144,6 +142,31 @@ public class GameStage {
 			root.getChildren().remove(board);
 			root.getChildren().addAll(win_imgView);
 			showMessage("PUZZLE SOLVED!");
+		}
+	}
+	
+//	Checks if the input configuration is solvable by counting inversions
+//	returns true if the configuration is solvable and false otherwise
+	@SuppressWarnings("unchecked")
+	private void checkIfSolvable(){
+		int inversions = 0;
+		
+		for(int i=1; i< MAX_CELLS; i++) {
+			for(int j=0; j<i; j++) {
+				if (input.get(i) != 0 && input.get(j)!= 0 && input.get(j)>input.get(i)) {
+					System.out.println("inversion: " + input.get(j) + " > " + input.get(i));
+					inversions++;
+				}
+			}
+		}
+		
+		System.out.println("= "+ inversions + " inversions");
+		if (inversions%2 == 0) System.out.println("Solvable.");
+		else {
+			System.out.println("Not solvable.");
+			gameDone = true;
+			showMessage("The puzzle is not solvable.");
+			System.exit(0);
 		}
 	}
 	
