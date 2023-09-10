@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
 
+import javafx.scene.Cursor;
+import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
@@ -15,6 +17,7 @@ public class Tile {
 	public int index;
 	protected Image img;
 	protected ImageView imgView;
+	private Scene scene;
 	
 	public final static Image ONE_IMAGE = new Image("assets/one.png",GameStage.TILE_WIDTH,GameStage.TILE_WIDTH,false,false);
 	public final static Image TWO_IMAGE = new Image("assets/two.png",GameStage.TILE_WIDTH,GameStage.TILE_WIDTH,false,false);
@@ -28,9 +31,10 @@ public class Tile {
 
 	public static final Map<Integer, ArrayList<Integer>> movable = new HashMap<Integer, ArrayList<Integer>>();
 	
-	public Tile(int number, int index){
+	public Tile(int number, int index, Scene scene){
 		this.number = number;
 		this.index = index;
+		this.scene = scene;
 
 		// load image depending on the number designated to this tile
 		switch(this.number) {
@@ -79,6 +83,14 @@ public class Tile {
 //					else System.out.println("Invalid action.");
 				}
 			});
+			this.imgView.setOnMouseEntered(event -> {
+				if(GameStage.CLICKABLES.get(GameStage.zeroIndex) != null && GameStage.CLICKABLES.get(GameStage.zeroIndex).contains(this.index))
+				this.scene.setCursor(Cursor.HAND);
+				});
+			this.imgView.setOnMouseExited(event -> {
+				if(GameStage.CLICKABLES.get(GameStage.zeroIndex) != null && GameStage.CLICKABLES.get(GameStage.zeroIndex).contains(this.index))
+					this.scene.setCursor(Cursor.DEFAULT);
+				});
 		}
 	}
 }

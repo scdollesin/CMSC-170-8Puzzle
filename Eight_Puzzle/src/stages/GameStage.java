@@ -15,7 +15,6 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
-import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
@@ -32,18 +31,6 @@ public class GameStage {
 	private ArrayList<Integer> input;
 	public static int zeroIndex;
 	public static final ArrayList<Integer> WIN_CONDITION = new ArrayList<Integer>(Arrays.asList(1,2,3,4,5,6,7,8,0));
-	@SuppressWarnings("serial")
-//	public static final HashMap<Integer, List<Integer>> CLICKABLES = new HashMap<Integer, List<Integer>>(){{
-//		CLICKABLES.put(0, Arrays.asList(1,3));
-//		CLICKABLES.put(1, Arrays.asList(0,2,4));
-//		CLICKABLES.put(2, Arrays.asList(1,5));
-//		CLICKABLES.put(3, Arrays.asList(0,4,6));
-//		CLICKABLES.put(4, Arrays.asList(1,3,5,7));
-//		CLICKABLES.put(5, Arrays.asList(2,5,8));
-//		CLICKABLES.put(6, Arrays.asList(3,7));
-//		CLICKABLES.put(7, Arrays.asList(4,6,8));
-//		CLICKABLES.put(8, Arrays.asList(5,7));
-//	}};
 	public static final HashMap<Integer, List<Integer>> CLICKABLES = new HashMap<Integer, List<Integer>>();
     
 	// Window Dimensions
@@ -118,7 +105,7 @@ public class GameStage {
 		for(int i=0; i<MAX_CELLS; i++) {
 			// Instantiate tile elements
 			int tile_number = this.input.get(tiles_created);
-			Tile newTile = new Tile(tile_number, tiles_created);
+			Tile newTile = new Tile(tile_number, tiles_created, scene);
 			if (tile_number == 0) zeroIndex = tiles_created;
 			// configure tile's clickability with respect to the empty tile's position
 			newTile.setMouseHandlers();
@@ -172,7 +159,6 @@ public class GameStage {
 	}
 	
 //	Checks if the input configuration is solvable by counting inversions
-//	returns true if the configuration is solvable and false otherwise
 	@SuppressWarnings("unchecked")
 	private void checkIfSolvable(){
 		int inversions = 0;
@@ -180,13 +166,13 @@ public class GameStage {
 		for(int i=1; i< MAX_CELLS; i++) {
 			for(int j=0; j<i; j++) {
 				if (input.get(i) != 0 && input.get(j)!= 0 && input.get(j)>input.get(i)) {
-//					System.out.println("inversion: " + input.get(j) + " > " + input.get(i));
+					//System.out.println("inversion: " + input.get(j) + " > " + input.get(i));
 					inversions++;
 				}
 			}
 		}
 		
-//		System.out.println("= "+ inversions + " inversions");
+		//System.out.println("= "+ inversions + " inversions");
 		if (inversions%2 == 0) System.out.println("Solvable.");
 		else {
 			System.out.println("Not solvable.");
