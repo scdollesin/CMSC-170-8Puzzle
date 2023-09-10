@@ -12,13 +12,14 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 
 public class GameStage {
 	private Stage stage;
     private Scene scene;
-    private Group root;
+    private static Group root;
     private Canvas canvas;
     private GraphicsContext gc;
     private static GridPane board;
@@ -44,10 +45,12 @@ public class GameStage {
 	public static boolean gameDone = false;
 	
 	private final Image bg = new Image("assets/background1.png",WINDOW_WIDTH,WINDOW_HEIGHT,false,false);
-	
+	private final static Image win_img = new Image("assets/win.png",BOARD_WIDTH,BOARD_HEIGHT,false,false);
+	private final static ImageView win_imgView = new ImageView();
+
 	
 	public GameStage(ArrayList<Integer> input) {
-		this.root = new Group();
+		root = new Group();
 		this.scene = new Scene(root, GameStage.WINDOW_WIDTH,GameStage.WINDOW_HEIGHT,Color.WHITE);
 		this.canvas = new Canvas(GameStage.WINDOW_WIDTH,GameStage.WINDOW_HEIGHT);
 		this.gc = canvas.getGraphicsContext2D();
@@ -56,10 +59,19 @@ public class GameStage {
 		this.input = input;
 		
 		setProperties();
+		checkBoard();	//checks if input is already arranged in the right order
+		//TODO: check if solvable
 	}
 	
 	//method to initialize the scene elements
 	private void setProperties(){
+		win_imgView.setImage(win_img);
+		win_imgView.setLayoutX(GameStage.BOARD_WIDTH*0.072);
+		win_imgView.setLayoutY(GameStage.BOARD_WIDTH*0.072);
+		win_imgView.setPreserveRatio(true);
+		win_imgView.setFitWidth(GameStage.BOARD_WIDTH);
+		win_imgView.setFitHeight(GameStage.BOARD_HEIGHT);
+		
 		this.gc.drawImage(this.bg, 0, 0);
 		this.createBoard();
 		this.root.getChildren().addAll(canvas, board);
@@ -126,8 +138,11 @@ public class GameStage {
 		if (current.equals(WIN_CONDITION)){
 			gameDone = true;
 			System.out.println(">>>>>>> YOU WIN! <<<<<<<<");
+			root.getChildren().remove(board);
+			root.getChildren().addAll(win_imgView);
 		}
 	}
+
 	
 	// Get the game's screen.
 	public Scene getScene() {

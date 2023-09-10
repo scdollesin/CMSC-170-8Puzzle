@@ -58,6 +58,7 @@ public class Tile {
 		this.imgView.setFitWidth(GameStage.TILE_WIDTH);
 		this.imgView.setFitHeight(GameStage.TILE_HEIGHT);
 	}
+	
 	public ImageView getImageView(){
 		return this.imgView;
 	}
