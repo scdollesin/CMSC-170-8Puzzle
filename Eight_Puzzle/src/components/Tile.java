@@ -1,8 +1,14 @@
 package components;
 
 import stages.GameStage;
+
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.HashMap;
+
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
 
 public class Tile {
 	private int number;
@@ -19,7 +25,8 @@ public class Tile {
 	public final static Image SEVEN_IMAGE = new Image("assets/seven.png",GameStage.TILE_WIDTH,GameStage.TILE_WIDTH,false,false);
 	public final static Image EIGHT_IMAGE = new Image("assets/eight.png",GameStage.TILE_WIDTH,GameStage.TILE_WIDTH,false,false);
 	public final static Image NINE_IMAGE = new Image("assets/nine.png",GameStage.TILE_WIDTH,GameStage.TILE_WIDTH,false,false);
-	
+
+	public static final Map<Integer, ArrayList<Integer>> movable = new HashMap<Integer, ArrayList<Integer>>();
 	
 	public Tile(int number, int index){
 		this.number = number;
@@ -40,7 +47,6 @@ public class Tile {
 		}
 		
 		this.setImageView();
-		this.setMouseHandlers();
 	}
 	
 	public int getNumber() {
@@ -63,12 +69,14 @@ public class Tile {
 	}
 
 	
-	private void setMouseHandlers(){
+	public void setMouseHandlers( ){
 		// swap tile clicked with empty tile
 		if (this.number!=0) {
 			this.imgView.setOnMouseClicked(event -> {
 				if (!GameStage.gameDone) {
+					if(GameStage.CLICKABLES.get(GameStage.zeroIndex) != null && GameStage.CLICKABLES.get(GameStage.zeroIndex).contains(this.index))
 					GameStage.swapTiles(this);
+//					else System.out.println("Invalid action.");
 				}
 			});
 		}

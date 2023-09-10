@@ -3,6 +3,8 @@ package stages;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
 
 import components.Tile;
 import javafx.scene.Group;
@@ -28,8 +30,21 @@ public class GameStage {
     private static GridPane board;
 	private static ArrayList<Tile> tiles;
 	private ArrayList<Integer> input;
-	private static int zeroIndex;
+	public static int zeroIndex;
 	public static final ArrayList<Integer> WIN_CONDITION = new ArrayList<Integer>(Arrays.asList(1,2,3,4,5,6,7,8,0));
+	@SuppressWarnings("serial")
+//	public static final HashMap<Integer, List<Integer>> CLICKABLES = new HashMap<Integer, List<Integer>>(){{
+//		CLICKABLES.put(0, Arrays.asList(1,3));
+//		CLICKABLES.put(1, Arrays.asList(0,2,4));
+//		CLICKABLES.put(2, Arrays.asList(1,5));
+//		CLICKABLES.put(3, Arrays.asList(0,4,6));
+//		CLICKABLES.put(4, Arrays.asList(1,3,5,7));
+//		CLICKABLES.put(5, Arrays.asList(2,5,8));
+//		CLICKABLES.put(6, Arrays.asList(3,7));
+//		CLICKABLES.put(7, Arrays.asList(4,6,8));
+//		CLICKABLES.put(8, Arrays.asList(5,7));
+//	}};
+	public static final HashMap<Integer, List<Integer>> CLICKABLES = new HashMap<Integer, List<Integer>>();
     
 	// Window Dimensions
 	public static final int WINDOW_WIDTH = 720;
@@ -60,6 +75,15 @@ public class GameStage {
 		board = new GridPane();
 		tiles = new ArrayList<Tile>();
 		this.input = input;
+		CLICKABLES.put(0, Arrays.asList(1,3));
+		CLICKABLES.put(1, Arrays.asList(0,2,4));
+		CLICKABLES.put(2, Arrays.asList(1,5));
+		CLICKABLES.put(3, Arrays.asList(0,4,6));
+		CLICKABLES.put(4, Arrays.asList(1,3,5,7));
+		CLICKABLES.put(5, Arrays.asList(2,4,8));
+		CLICKABLES.put(6, Arrays.asList(3,7));
+		CLICKABLES.put(7, Arrays.asList(4,6,8));
+		CLICKABLES.put(8, Arrays.asList(5,7));
 		
 		setProperties();
 		checkWin();	//checks if input is already arranged in the right order
@@ -68,7 +92,7 @@ public class GameStage {
 	}
 	
 	//method to initialize the scene elements
-	private void setProperties(){
+	private void setProperties(){		
 		win_imgView.setImage(win_img);
 		win_imgView.setLayoutX(GameStage.BOARD_WIDTH*0.072);
 		win_imgView.setLayoutY(GameStage.BOARD_WIDTH*0.072);
@@ -96,7 +120,9 @@ public class GameStage {
 			int tile_number = this.input.get(tiles_created);
 			Tile newTile = new Tile(tile_number, tiles_created);
 			if (tile_number == 0) zeroIndex = tiles_created;
-
+			// configure tile's clickability with respect to the empty tile's position
+			newTile.setMouseHandlers();
+			
 			tiles_created++;
 
 			//add each tile to the array list tiles
@@ -119,7 +145,7 @@ public class GameStage {
 	
 	public static void swapTiles(Tile clicked){
 		Collections.swap(tiles, zeroIndex, clicked.index);
-		System.out.println("Swapped indexes: " + zeroIndex + " " + clicked.index);
+//		System.out.println("Swapped indexes: " + zeroIndex + " " + clicked.index);
 		int temp = zeroIndex;
 		zeroIndex = clicked.index;
 		clicked.index = temp;
@@ -141,7 +167,7 @@ public class GameStage {
 			System.out.println(">>>>>>> YOU WIN! <<<<<<<<");
 			root.getChildren().remove(board);
 			root.getChildren().addAll(win_imgView);
-			showMessage("PUZZLE SOLVED!");
+			showMessage("Puzzle solved!");
 		}
 	}
 	
@@ -154,13 +180,13 @@ public class GameStage {
 		for(int i=1; i< MAX_CELLS; i++) {
 			for(int j=0; j<i; j++) {
 				if (input.get(i) != 0 && input.get(j)!= 0 && input.get(j)>input.get(i)) {
-					System.out.println("inversion: " + input.get(j) + " > " + input.get(i));
+//					System.out.println("inversion: " + input.get(j) + " > " + input.get(i));
 					inversions++;
 				}
 			}
 		}
 		
-		System.out.println("= "+ inversions + " inversions");
+//		System.out.println("= "+ inversions + " inversions");
 		if (inversions%2 == 0) System.out.println("Solvable.");
 		else {
 			System.out.println("Not solvable.");
