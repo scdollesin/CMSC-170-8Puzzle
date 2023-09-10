@@ -10,6 +10,9 @@ import javafx.stage.Stage;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -140,7 +143,18 @@ public class GameStage {
 			System.out.println(">>>>>>> YOU WIN! <<<<<<<<");
 			root.getChildren().remove(board);
 			root.getChildren().addAll(win_imgView);
+			showMessage("PUZZLE SOLVED!");
 		}
+	}
+	
+	private static void showMessage(String message){
+		Alert popup = new Alert(AlertType.NONE);
+		popup.setTitle("Message");
+		popup.setHeaderText(null);
+		popup.setContentText(message);
+		popup.getDialogPane().getButtonTypes().add(ButtonType.OK);
+		((Stage) popup.getDialogPane().getScene().getWindow()).getIcons().add(new Image("assets/icon.png"));
+		popup.showAndWait();
 	}
 
 	
@@ -152,6 +166,7 @@ public class GameStage {
 	public void setStage(Stage stage) {
 		this.stage = stage;
 		this.stage.setTitle("8-Puzzle (Brawl Stars Edition)");		// Sets window title.
+		this.stage.getIcons().add(new Image("assets/icon.png"));
 		this.stage.setResizable(false);								// Prevents the user from resizing the window.
 		this.stage.show();
 	}
