@@ -5,8 +5,9 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-
+import javafx.scene.layout.HBox;
 import components.Tile;
+import javafx.scene.Cursor;
 import javafx.scene.Group;
 import javafx.stage.Stage;
 import javafx.scene.Scene;
@@ -15,6 +16,7 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
@@ -32,10 +34,13 @@ public class GameStage {
 	public static int zeroIndex;
 	public static final ArrayList<Integer> WIN_CONDITION = new ArrayList<Integer>(Arrays.asList(1,2,3,4,5,6,7,8,0));
 	public static final HashMap<Integer, List<Integer>> CLICKABLES = new HashMap<Integer, List<Integer>>();
+	private static ChoiceBox<String> modeSelect;
+	public static String mode;
     
 	// Window Dimensions
-	public static final int WINDOW_WIDTH = 720;
-	public static final int WINDOW_HEIGHT = 720;
+	public static final double WINDOW_HEIGHT = 720;
+	public static final double WINDOW_WIDTH = WINDOW_HEIGHT*0.75; //720
+	
 	// Grid configurations
 	public final static int MAX_CELLS = 9;
 	public final static int BOARD_NUM_ROWS = 3;
@@ -49,10 +54,11 @@ public class GameStage {
 	
 	public static boolean gameDone = false;
 	
-	private final Image bg = new Image("assets/background1.png",WINDOW_WIDTH,WINDOW_HEIGHT,false,false);
+	private final Image bg = new Image("assets/background.png",WINDOW_WIDTH,WINDOW_HEIGHT,false,false);
 	private final static Image win_img = new Image("assets/win.png",BOARD_WIDTH,BOARD_HEIGHT,false,false);
-	private final static ImageView win_imgView = new ImageView();
-
+	private final static ImageView win_imgView = new ImageView(win_img);
+	private final static Image solution_btn = new Image("assets/solution_btn.png",BOARD_WIDTH/3.5,BOARD_HEIGHT/8.5,false,false);
+	private final static ImageView solution_imgView = new ImageView(solution_btn);
 	
 	public GameStage(ArrayList<Integer> input) {
 		root = new Group();
@@ -62,6 +68,8 @@ public class GameStage {
 		board = new GridPane();
 		tiles = new ArrayList<Tile>();
 		this.input = input;
+		GameStage.mode = "--";
+		GameStage.modeSelect = new ChoiceBox<String>();
 		CLICKABLES.put(0, Arrays.asList(1,3));
 		CLICKABLES.put(1, Arrays.asList(0,2,4));
 		CLICKABLES.put(2, Arrays.asList(1,5));
@@ -80,16 +88,40 @@ public class GameStage {
 	
 	//method to initialize the scene elements
 	private void setProperties(){		
-		win_imgView.setImage(win_img);
 		win_imgView.setLayoutX(GameStage.BOARD_WIDTH*0.072);
 		win_imgView.setLayoutY(GameStage.BOARD_WIDTH*0.072);
 		win_imgView.setPreserveRatio(true);
 		win_imgView.setFitWidth(GameStage.BOARD_WIDTH);
 		win_imgView.setFitHeight(GameStage.BOARD_HEIGHT);
 		
+		HBox solution_hb = new HBox();
+		modeSelect.getItems().addAll("--", "Breadth First Search (BFS)", "Depth First Search (DFS)");
+		modeSelect.setValue("--");
+		modeSelect.setPrefHeight(BOARD_HEIGHT/9);
+		modeSelect.setPrefWidth(BOARD_WIDTH/1.5);
+		modeSelect.setStyle("-fx-font-size: 20;");
+		
+		solution_imgView.setOnMouseClicked(event -> {
+			String choice = modeSelect.getValue();
+			if (!GameStage.gameDone) {
+				if (choice == "Breadth First Search (BFS)" || choice == "Depth First Search (DFS)"){
+					System.out.println(choice);
+					GameStage.mode = choice;
+					gameDone = true;
+				}
+			}
+		});
+		solution_imgView.setOnMouseEntered(event -> {this.scene.setCursor(Cursor.HAND);});
+		solution_imgView.setOnMouseExited(event -> {this.scene.setCursor(Cursor.DEFAULT);});
+		
+		solution_hb.getChildren().addAll(modeSelect, solution_imgView);
+		solution_hb.setLayoutX(GameStage.BOARD_WIDTH*0.072);
+		solution_hb.setLayoutY(GameStage.BOARD_WIDTH + 120);
+		solution_hb.setSpacing(20);
+		
 		this.gc.drawImage(this.bg, 0, 0);
 		this.createBoard();
-		root.getChildren().addAll(canvas, board);
+		root.getChildren().addAll(canvas, solution_hb, board);
 	}
 	
 	private void createBoard(){
