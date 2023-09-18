@@ -3,6 +3,7 @@ package stages;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.List;
 import javafx.scene.layout.HBox;
@@ -36,6 +37,7 @@ public class GameStage {
 	public static final HashMap<Integer, List<Integer>> CLICKABLES = new HashMap<Integer, List<Integer>>();
 	private static ChoiceBox<String> modeSelect;
 	public static String mode;
+	public static Deque<ArrayList<ArrayList<String>>> frontier;	//data structure for BFS
     
 	// Window Dimensions
 	public static final double WINDOW_HEIGHT = 720;
@@ -59,6 +61,7 @@ public class GameStage {
 	private final static ImageView win_imgView = new ImageView(win_img);
 	private final static Image solution_btn = new Image("assets/solution_btn.png",BOARD_WIDTH/3.5,BOARD_HEIGHT/8.5,false,false);
 	private final static Image next_btn = new Image("assets/next_btn.png",BOARD_WIDTH/3.5,BOARD_HEIGHT/8.5,false,false);
+	private final static Image exit_btn = new Image("assets/exit_btn.png",BOARD_WIDTH/3.5,BOARD_HEIGHT/8.5,false,false);
 	private final static ImageView solution_imgView = new ImageView(solution_btn);
 	
 	public GameStage(ArrayList<Integer> input) {
@@ -111,6 +114,10 @@ public class GameStage {
 					modeSelect.setDisable(true);
 					solution_imgView.setImage(next_btn);
 					gameDone = true;	//disables ability to click tiles
+					
+					//reset board
+					tiles.clear();
+					createBoard();
 				}
 			} else {
 				System.out.println("Next");
@@ -191,6 +198,9 @@ public class GameStage {
 			System.out.println(">>>>>>> YOU WIN! <<<<<<<<");
 			root.getChildren().remove(board);
 			root.getChildren().addAll(win_imgView);
+			modeSelect.setDisable(true);
+			solution_imgView.setImage(exit_btn);
+			solution_imgView.setOnMouseClicked(event -> {System.exit(0);});
 			showMessage("Puzzle solved!");
 		}
 	}
