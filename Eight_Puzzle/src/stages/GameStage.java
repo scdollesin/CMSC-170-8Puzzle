@@ -79,8 +79,8 @@ public class GameStage {
 		bfs_frontier = new ArrayDeque<ArrayList<ArrayList<Integer>>>();
 		explored = new ArrayList<ArrayList<Integer>>();
 		
-		// U R D L
-		CLICKABLES.put(0, Arrays.asList(9,1,3,9));
+		// index 0=Up 1=Right 2=Down 3=Left; a value of 9 in an index means that it is not a valid move
+		CLICKABLES.put(0, Arrays.asList(9,1,3,9));		//example: valid moves are Right and Down only
 		CLICKABLES.put(1, Arrays.asList(9,2,4,0));
 		CLICKABLES.put(2, Arrays.asList(9,9,5,1));
 		CLICKABLES.put(3, Arrays.asList(0,4,6,9));

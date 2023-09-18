@@ -79,7 +79,6 @@ public class Tile {
 			this.imgView.setOnMouseClicked(event -> {
 				if (!GameStage.gameDone) {
 					if(GameStage.CLICKABLES.get(GameStage.zeroIndex) != null && GameStage.CLICKABLES.get(GameStage.zeroIndex).contains(this.index)) {
-						GameStage.swapTiles(this);
 						int pos = GameStage.CLICKABLES.get(GameStage.zeroIndex).indexOf(this.index);
 						switch(pos) {
 							case 0: System.out.println("UP"); break;
@@ -87,6 +86,7 @@ public class Tile {
 							case 2: System.out.println("DOWN"); break;
 							case 3: System.out.println("LEFT"); break;
 						}
+						GameStage.swapTiles(this);
 					}
 //					else System.out.println("Invalid action.");
 				}
