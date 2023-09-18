@@ -78,8 +78,16 @@ public class Tile {
 		if (this.number!=0) {
 			this.imgView.setOnMouseClicked(event -> {
 				if (!GameStage.gameDone) {
-					if(GameStage.CLICKABLES.get(GameStage.zeroIndex) != null && GameStage.CLICKABLES.get(GameStage.zeroIndex).contains(this.index))
-					GameStage.swapTiles(this);
+					if(GameStage.CLICKABLES.get(GameStage.zeroIndex) != null && GameStage.CLICKABLES.get(GameStage.zeroIndex).contains(this.index)) {
+						GameStage.swapTiles(this);
+						int pos = GameStage.CLICKABLES.get(GameStage.zeroIndex).indexOf(this.index);
+						switch(pos) {
+							case 0: System.out.println("UP"); break;
+							case 1: System.out.println("RIGHT"); break;
+							case 2: System.out.println("DOWN"); break;
+							case 3: System.out.println("LEFT"); break;
+						}
+					}
 //					else System.out.println("Invalid action.");
 				}
 			});

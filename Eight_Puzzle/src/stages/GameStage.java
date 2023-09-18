@@ -3,6 +3,7 @@ package stages;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.List;
@@ -37,7 +38,8 @@ public class GameStage {
 	public static final HashMap<Integer, List<Integer>> CLICKABLES = new HashMap<Integer, List<Integer>>();
 	private static ChoiceBox<String> modeSelect;
 	public static String mode;
-	public static Deque<ArrayList<ArrayList<String>>> frontier;	//data structure for BFS
+	public static Deque<ArrayList<ArrayList<Integer>>> bfs_frontier;	//data structure for BFS
+	public static ArrayList<ArrayList<Integer>> explored;				//explored list
     
 	// Window Dimensions
 	public static final double WINDOW_HEIGHT = 720;
@@ -74,20 +76,23 @@ public class GameStage {
 		this.input = input;
 		GameStage.mode = "--";
 		GameStage.modeSelect = new ChoiceBox<String>();
-		CLICKABLES.put(0, Arrays.asList(1,3));
-		CLICKABLES.put(1, Arrays.asList(0,2,4));
-		CLICKABLES.put(2, Arrays.asList(1,5));
-		CLICKABLES.put(3, Arrays.asList(0,4,6));
-		CLICKABLES.put(4, Arrays.asList(1,3,5,7));
-		CLICKABLES.put(5, Arrays.asList(2,4,8));
-		CLICKABLES.put(6, Arrays.asList(3,7));
-		CLICKABLES.put(7, Arrays.asList(4,6,8));
-		CLICKABLES.put(8, Arrays.asList(5,7));
+		bfs_frontier = new ArrayDeque<ArrayList<ArrayList<Integer>>>();
+		explored = new ArrayList<ArrayList<Integer>>();
+		
+		// U R D L
+		CLICKABLES.put(0, Arrays.asList(9,1,3,9));
+		CLICKABLES.put(1, Arrays.asList(9,2,4,0));
+		CLICKABLES.put(2, Arrays.asList(9,9,5,1));
+		CLICKABLES.put(3, Arrays.asList(0,4,6,9));
+		CLICKABLES.put(4, Arrays.asList(1,5,7,3));
+		CLICKABLES.put(5, Arrays.asList(2,9,8,4));
+		CLICKABLES.put(6, Arrays.asList(3,7,9,9));
+		CLICKABLES.put(7, Arrays.asList(4,8,9,6));
+		CLICKABLES.put(8, Arrays.asList(5,9,9,7));
 		
 		setProperties();
 		checkWin();	//checks if input is already arranged in the right order
-		//TODO: check if solvable
-		checkIfSolvable();
+		checkIfSolvable(); //checks if solvable
 	}
 	
 	//method to initialize the scene elements
