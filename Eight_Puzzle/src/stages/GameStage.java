@@ -58,6 +58,7 @@ public class GameStage {
 	private final static Image win_img = new Image("assets/win.png",BOARD_WIDTH,BOARD_HEIGHT,false,false);
 	private final static ImageView win_imgView = new ImageView(win_img);
 	private final static Image solution_btn = new Image("assets/solution_btn.png",BOARD_WIDTH/3.5,BOARD_HEIGHT/8.5,false,false);
+	private final static Image next_btn = new Image("assets/next_btn.png",BOARD_WIDTH/3.5,BOARD_HEIGHT/8.5,false,false);
 	private final static ImageView solution_imgView = new ImageView(solution_btn);
 	
 	public GameStage(ArrayList<Integer> input) {
@@ -103,12 +104,16 @@ public class GameStage {
 		
 		solution_imgView.setOnMouseClicked(event -> {
 			String choice = modeSelect.getValue();
-			if (!GameStage.gameDone) {
+			if (mode == "--") {
 				if (choice == "Breadth First Search (BFS)" || choice == "Depth First Search (DFS)"){
 					System.out.println(choice);
 					GameStage.mode = choice;
-					gameDone = true;
+					modeSelect.setDisable(true);
+					solution_imgView.setImage(next_btn);
+					gameDone = true;	//disables ability to click tiles
 				}
+			} else {
+				System.out.println("Next");
 			}
 		});
 		solution_imgView.setOnMouseEntered(event -> {this.scene.setCursor(Cursor.HAND);});
