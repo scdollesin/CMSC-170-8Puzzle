@@ -7,6 +7,9 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+
 import javafx.scene.layout.HBox;
 import components.Tile;
 import javafx.scene.Cursor;
@@ -39,7 +42,6 @@ public class GameStage {
 	private static ChoiceBox<String> modeSelect;
 	public static String mode;
 	public static Deque<ArrayList<ArrayList<Integer>>> bfs_frontier;	//data structure for BFS
-	public static ArrayList<ArrayList<Integer>> explored;				//explored list
     
 	// Window Dimensions
 	public static final double WINDOW_HEIGHT = 720;
@@ -76,8 +78,6 @@ public class GameStage {
 		this.input = input;
 		GameStage.mode = "--";
 		GameStage.modeSelect = new ChoiceBox<String>();
-		bfs_frontier = new ArrayDeque<ArrayList<ArrayList<Integer>>>();
-		explored = new ArrayList<ArrayList<Integer>>();
 		
 		// index 0=Up 1=Right 2=Down 3=Left; a value of 9 in an index means that it is not a valid move
 		CLICKABLES.put(0, Arrays.asList(9,1,3,9));		//example: valid moves are Right and Down only
@@ -123,6 +123,16 @@ public class GameStage {
 					//reset board
 					tiles.clear();
 					createBoard();
+					ArrayList<ArrayList<Integer>> solution = treeSearch();
+					System.out.println("Path:");
+				    for (Integer move : solution.get(1)){
+						switch(move){
+						case 0: System.out.print("UP > "); break;
+						case 1: System.out.print("RIGHT > "); break;
+						case 2: System.out.print("DOWN > "); break;
+						case 3: System.out.print("LEFT > "); break;
+						}
+				    }
 				}
 			} else {
 				System.out.println("Next");
@@ -139,6 +149,127 @@ public class GameStage {
 		this.gc.drawImage(this.bg, 0, 0);
 		this.createBoard();
 		root.getChildren().addAll(canvas, solution_hb, board);
+	}
+
+	// A state is composed of two lists, that is the configuration and the path
+	private ArrayList<ArrayList<Integer>> createState(ArrayList<Integer> configuration){
+		ArrayList<ArrayList<Integer>> newState = new ArrayList<ArrayList<Integer>>();
+		
+		//add configuration
+		newState.add(configuration);
+		
+		//add path
+		ArrayList<Integer> path = new ArrayList<>();
+		newState.add(path);
+		
+		return newState;
+	}
+	
+	private ArrayList<ArrayList<Integer>> treeSearch(){
+		final long startTime = System.nanoTime();
+		
+		ArrayList<ArrayList<Integer>> solution = new ArrayList<ArrayList<Integer>>();
+		ArrayList<ArrayList<Integer>> explored = new ArrayList<ArrayList<Integer>>();				//explored list
+		
+		if(mode == "Breadth First Search (BFS)"){
+			Deque<ArrayList<ArrayList<Integer>>> frontier = new ArrayDeque<ArrayList<ArrayList<Integer>>>();
+			frontier.addFirst(createState(input));
+//			explored.add(input);
+			
+			while(!frontier.isEmpty()){
+				System.out.print("> ");
+				ArrayList<ArrayList<Integer>> currentState = frontier.removeFirst();
+				
+				
+				while(explored.contains(currentState.get(0))) {System.out.println("explored!"); currentState = frontier.removeFirst();}	//make sure that the current state hasnt been explored yet
+				
+				System.out.print("[");
+			    for (Integer x : currentState.get(0)){
+			    	System.out.print(x+ ", ");
+			    }
+			    System.out.println("]");
+			    
+				if(GoalTest(currentState)) {
+					final long endTime = System.nanoTime();
+					final double execTime = endTime - startTime;
+					
+					System.out.println("BFS execution time: " + Math.round((execTime/1000000000) * 100.0) / 100.0 + "s");
+					return currentState;
+				}
+				
+				else{
+					if(!explored.contains(currentState.get(0))) explored.add(currentState.get(0));
+					
+					for(int action : Action(currentState)){
+						frontier.addLast(Result(currentState, action));
+						System.out.println("added to frontier!");
+					}
+				}
+			}
+		} else if (mode == "Depth First Search (DFS)") {
+			
+		}
+		return solution;
+	}
+	
+	private ArrayList<Integer> Action(ArrayList<ArrayList<Integer>> state){
+		ArrayList<Integer> actions = new ArrayList<Integer>(CLICKABLES.get(state.get(0).indexOf(0)));
+		actions.removeAll(Collections.singleton(9));	//remove placeholder 9 from valid actions
+		
+		System.out.print("Moves: [");
+	    for (Integer x : actions){
+	    	System.out.print(x+ " ");
+	    }
+	    System.out.println("]");
+		
+		return actions;
+	}
+	
+	private Boolean GoalTest(ArrayList<ArrayList<Integer>> state){
+		if (state.get(0).equals(WIN_CONDITION))return true;
+		else return false;
+	}
+	
+	private ArrayList<ArrayList<Integer>> Result(ArrayList<ArrayList<Integer>> state, int action){
+		System.out.print("STATE >> ");
+
+		System.out.print("[");
+	    for (Integer x : state.get(0)){
+	    	System.out.print(x+ ", ");
+	    }
+	    System.out.println("]");
+		
+	    ArrayList<ArrayList<Integer>> result = new ArrayList<>(state.stream().map(x -> new ArrayList<>(x)).collect(Collectors.toList()));
+//		ArrayList<ArrayList<Integer>> result = new ArrayList<ArrayList<Integer>>(state);	//have the result be set initially as the state given
+		int emptyIndex = result.get(0).indexOf(0);
+		System.out.println("zero: "+ emptyIndex);
+		
+		System.out.println("action: "+ action);
+		int move = GameStage.CLICKABLES.get(emptyIndex).indexOf(action);
+		System.out.print("move: "+ move+" ");
+		switch(move) {
+			case 0: System.out.println("UP"); break;
+			case 1: System.out.println("RIGHT"); break;
+			case 2: System.out.println("DOWN"); break;
+			case 3: System.out.println("LEFT"); break;
+			default: System.out.println("INVALID"); break;
+		}
+		result.get(1).add(move);
+		Collections.swap(result.get(0), emptyIndex, action);
+		
+		System.out.print("Result: [");
+	    for (Integer x : result.get(0)){
+	    	System.out.print(x+ ", ");
+	    }
+	    System.out.println("]");
+	    
+		System.out.print("State: [");
+	    for (Integer x : result.get(0)){
+	    	System.out.print(x+ ", ");
+	    }
+	    System.out.println("]");
+		
+		return result;
 	}
 	
 	private void createBoard(){
@@ -200,7 +331,7 @@ public class GameStage {
 		}
 		if (current.equals(WIN_CONDITION)){
 			gameDone = true;
-			System.out.println(">>>>>>> YOU WIN! <<<<<<<<");
+			System.out.println("\n>>>>>>> YOU WIN! <<<<<<<<");
 			root.getChildren().remove(board);
 			root.getChildren().addAll(win_imgView);
 			modeSelect.setDisable(true);

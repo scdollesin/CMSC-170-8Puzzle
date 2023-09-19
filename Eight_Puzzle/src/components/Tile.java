@@ -81,10 +81,10 @@ public class Tile {
 					if(GameStage.CLICKABLES.get(GameStage.zeroIndex) != null && GameStage.CLICKABLES.get(GameStage.zeroIndex).contains(this.index)) {
 						int pos = GameStage.CLICKABLES.get(GameStage.zeroIndex).indexOf(this.index);
 						switch(pos) {
-							case 0: System.out.println("UP"); break;
-							case 1: System.out.println("RIGHT"); break;
-							case 2: System.out.println("DOWN"); break;
-							case 3: System.out.println("LEFT"); break;
+							case 0: System.out.print("UP > "); break;
+							case 1: System.out.print("RIGHT > "); break;
+							case 2: System.out.print("DOWN > "); break;
+							case 3: System.out.print("LEFT > "); break;
 						}
 						GameStage.swapTiles(this);
 					}
