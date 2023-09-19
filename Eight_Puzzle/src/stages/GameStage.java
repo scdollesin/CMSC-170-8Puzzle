@@ -124,7 +124,7 @@ public class GameStage {
 					tiles.clear();
 					createBoard();
 					ArrayList<ArrayList<Integer>> solution = treeSearch();
-					System.out.println("Path:");
+					System.out.println("Path (cost="+ PathCost(solution.get(1)) + "):");
 				    for (Integer move : solution.get(1)){
 						switch(move){
 						case 0: System.out.print("UP > "); break;
@@ -149,6 +149,10 @@ public class GameStage {
 		this.gc.drawImage(this.bg, 0, 0);
 		this.createBoard();
 		root.getChildren().addAll(canvas, solution_hb, board);
+	}
+	
+	private int PathCost(ArrayList<Integer> path){
+		return path.size();
 	}
 
 	// A state is composed of two lists, that is the configuration and the path
