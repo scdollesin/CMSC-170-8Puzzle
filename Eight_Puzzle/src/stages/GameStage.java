@@ -175,10 +175,6 @@ public class GameStage {
 	private void nextMove(){
 		swapTiles(tiles.get(CLICKABLES.get(zeroIndex).get(path.get(nextCount++))));
 	}
-	
-	private static int PathCost(ArrayList<Integer> p){
-		return p.size();
-	}
 
 	// A state is composed of two lists, that is the configuration and the path
 	private ArrayList<ArrayList<Integer>> createState(ArrayList<Integer> configuration){
@@ -194,6 +190,8 @@ public class GameStage {
 		return newState;
 	}
 	
+	
+	// treeSearch()
 	private ArrayList<ArrayList<Integer>> treeSearch(){
 		final long startTime = System.nanoTime();
 		
@@ -255,17 +253,21 @@ public class GameStage {
 		return solution;
 	}
 	
+	// Action()
 	private ArrayList<Integer> Action(ArrayList<ArrayList<Integer>> state){
 		ArrayList<Integer> actions = new ArrayList<Integer>(CLICKABLES.get(state.get(0).indexOf(0)));
 		actions.removeAll(Collections.singleton(9));	//remove placeholder 9 from valid actions
 		return actions;
 	}
 	
+	// GoalTest()
 	private Boolean GoalTest(ArrayList<ArrayList<Integer>> state){
 		if (state.get(0).equals(WIN_CONDITION))return true;
 		else return false;
 	}
 	
+	
+	// Result()
 	private ArrayList<ArrayList<Integer>> Result(ArrayList<ArrayList<Integer>> state, int action){
 	    ArrayList<ArrayList<Integer>> result = new ArrayList<>(state.stream().map(x -> new ArrayList<>(x)).collect(Collectors.toList()));
 
@@ -275,6 +277,11 @@ public class GameStage {
 		Collections.swap(result.get(0), emptyIndex, action);
 		
 		return result;
+	}
+	
+	// PathCost()
+	private static int PathCost(ArrayList<Integer> p){
+		return p.size();
 	}
 	
 	private void createBoard(){
