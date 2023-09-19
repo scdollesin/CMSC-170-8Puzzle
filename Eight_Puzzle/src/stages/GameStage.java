@@ -1,5 +1,7 @@
 package stages;
 
+import java.io.IOException;
+import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -7,9 +9,8 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
-
+import java.util.Stack;
 import javafx.scene.layout.HBox;
 import components.Tile;
 import javafx.scene.Cursor;
@@ -26,6 +27,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
+import javafx.scene.control.Label;
 
 public class GameStage {
 	private Stage stage;
@@ -41,8 +43,9 @@ public class GameStage {
 	public static final HashMap<Integer, List<Integer>> CLICKABLES = new HashMap<Integer, List<Integer>>();
 	private static ChoiceBox<String> modeSelect;
 	public static String mode;
-	public static Deque<ArrayList<ArrayList<Integer>>> bfs_frontier;	//data structure for BFS
-    
+	public static ArrayList<Integer> path = new ArrayList<Integer>();
+	public static int nextCount = 0;
+	
 	// Window Dimensions
 	public static final double WINDOW_HEIGHT = 720;
 	public static final double WINDOW_WIDTH = WINDOW_HEIGHT*0.75; //720
@@ -114,7 +117,7 @@ public class GameStage {
 			String choice = modeSelect.getValue();
 			if (mode == "--") {
 				if (choice == "Breadth First Search (BFS)" || choice == "Depth First Search (DFS)"){
-					System.out.println(choice);
+					System.out.println("\n" + choice);
 					GameStage.mode = choice;
 					modeSelect.setDisable(true);
 					solution_imgView.setImage(next_btn);
@@ -123,19 +126,13 @@ public class GameStage {
 					//reset board
 					tiles.clear();
 					createBoard();
+					//search for solution
 					ArrayList<ArrayList<Integer>> solution = treeSearch();
-					System.out.println("Path (cost="+ PathCost(solution.get(1)) + "):");
-				    for (Integer move : solution.get(1)){
-						switch(move){
-						case 0: System.out.print("UP > "); break;
-						case 1: System.out.print("RIGHT > "); break;
-						case 2: System.out.print("DOWN > "); break;
-						case 3: System.out.print("LEFT > "); break;
-						}
-				    }
+					path = solution.get(1);
+					writeSolution(path);
 				}
 			} else {
-				System.out.println("Next");
+				nextMove();
 			}
 		});
 		solution_imgView.setOnMouseEntered(event -> {this.scene.setCursor(Cursor.HAND);});
@@ -151,8 +148,36 @@ public class GameStage {
 		root.getChildren().addAll(canvas, solution_hb, board);
 	}
 	
-	private int PathCost(ArrayList<Integer> path){
-		return path.size();
+	private void writeSolution(ArrayList<Integer> path){
+		ArrayList<String> moves = new ArrayList<String>();
+		for(int p : path) {
+			switch(p) {
+			case 0: moves.add("U"); break;
+			case 1: moves.add("R"); break;
+			case 2: moves.add("D"); break;
+			case 3: moves.add("L"); break;
+			default: System.out.println("Error: Invalid write to file.");
+			}
+		}
+		String output = String.join(" ", moves);
+		System.out.println("Cost: "+ PathCost(path) + "\nPath: \n"+output);
+		
+		try (FileWriter writer = new FileWriter("puzzle.out")){
+			writer.write(output);
+			writer.close();
+			showMessage("Solution:\t"+output);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+	}
+
+	private void nextMove(){
+		swapTiles(tiles.get(CLICKABLES.get(zeroIndex).get(path.get(nextCount++))));
+	}
+	
+	private static int PathCost(ArrayList<Integer> p){
+		return p.size();
 	}
 
 	// A state is composed of two lists, that is the configuration and the path
@@ -178,26 +203,17 @@ public class GameStage {
 		if(mode == "Breadth First Search (BFS)"){
 			Deque<ArrayList<ArrayList<Integer>>> frontier = new ArrayDeque<ArrayList<ArrayList<Integer>>>();
 			frontier.addFirst(createState(input));
-//			explored.add(input);
 			
 			while(!frontier.isEmpty()){
-				System.out.print("> ");
 				ArrayList<ArrayList<Integer>> currentState = frontier.removeFirst();
 				
+				while(explored.contains(currentState.get(0))) {currentState = frontier.removeFirst();}	//make sure that the current state hasnt been explored yet
 				
-				while(explored.contains(currentState.get(0))) {System.out.println("explored!"); currentState = frontier.removeFirst();}	//make sure that the current state hasnt been explored yet
-				
-				System.out.print("[");
-			    for (Integer x : currentState.get(0)){
-			    	System.out.print(x+ ", ");
-			    }
-			    System.out.println("]");
-			    
 				if(GoalTest(currentState)) {
 					final long endTime = System.nanoTime();
 					final double execTime = endTime - startTime;
 					
-					System.out.println("BFS execution time: " + Math.round((execTime/1000000000) * 100.0) / 100.0 + "s");
+					System.out.println("Execution time: " + Math.round((execTime/1000000000) * 100.0) / 100.0 + "s");
 					return currentState;
 				}
 				
@@ -206,12 +222,35 @@ public class GameStage {
 					
 					for(int action : Action(currentState)){
 						frontier.addLast(Result(currentState, action));
-						System.out.println("added to frontier!");
 					}
 				}
 			}
 		} else if (mode == "Depth First Search (DFS)") {
+			Stack<ArrayList<ArrayList<Integer>>> frontier = new Stack<ArrayList<ArrayList<Integer>>>();
+			frontier.push(createState(input));
 			
+			while(!frontier.isEmpty()){
+				ArrayList<ArrayList<Integer>> currentState = frontier.pop();
+				
+				
+				while(explored.contains(currentState.get(0))) {currentState = frontier.pop();}	//make sure that the current state hasnt been explored yet
+			    
+				if(GoalTest(currentState)) {
+					final long endTime = System.nanoTime();
+					final double execTime = endTime - startTime;
+					
+					System.out.println("Execution time: " + Math.round((execTime/1000000000) * 100.0) / 100.0 + "s");
+					return currentState;
+				}
+				
+				else{
+					if(!explored.contains(currentState.get(0))) explored.add(currentState.get(0));
+					
+					for(int action : Action(currentState)){
+						frontier.push(Result(currentState, action));
+					}
+				}
+			}
 		}
 		return solution;
 	}
@@ -219,13 +258,6 @@ public class GameStage {
 	private ArrayList<Integer> Action(ArrayList<ArrayList<Integer>> state){
 		ArrayList<Integer> actions = new ArrayList<Integer>(CLICKABLES.get(state.get(0).indexOf(0)));
 		actions.removeAll(Collections.singleton(9));	//remove placeholder 9 from valid actions
-		
-		System.out.print("Moves: [");
-	    for (Integer x : actions){
-	    	System.out.print(x+ " ");
-	    }
-	    System.out.println("]");
-		
 		return actions;
 	}
 	
@@ -235,43 +267,12 @@ public class GameStage {
 	}
 	
 	private ArrayList<ArrayList<Integer>> Result(ArrayList<ArrayList<Integer>> state, int action){
-		System.out.print("STATE >> ");
-
-		System.out.print("[");
-	    for (Integer x : state.get(0)){
-	    	System.out.print(x+ ", ");
-	    }
-	    System.out.println("]");
-		
 	    ArrayList<ArrayList<Integer>> result = new ArrayList<>(state.stream().map(x -> new ArrayList<>(x)).collect(Collectors.toList()));
-//		ArrayList<ArrayList<Integer>> result = new ArrayList<ArrayList<Integer>>(state);	//have the result be set initially as the state given
+
 		int emptyIndex = result.get(0).indexOf(0);
-		System.out.println("zero: "+ emptyIndex);
-		
-		System.out.println("action: "+ action);
 		int move = GameStage.CLICKABLES.get(emptyIndex).indexOf(action);
-		System.out.print("move: "+ move+" ");
-		switch(move) {
-			case 0: System.out.println("UP"); break;
-			case 1: System.out.println("RIGHT"); break;
-			case 2: System.out.println("DOWN"); break;
-			case 3: System.out.println("LEFT"); break;
-			default: System.out.println("INVALID"); break;
-		}
 		result.get(1).add(move);
 		Collections.swap(result.get(0), emptyIndex, action);
-		
-		System.out.print("Result: [");
-	    for (Integer x : result.get(0)){
-	    	System.out.print(x+ ", ");
-	    }
-	    System.out.println("]");
-	    
-		System.out.print("State: [");
-	    for (Integer x : result.get(0)){
-	    	System.out.print(x+ ", ");
-	    }
-	    System.out.println("]");
 		
 		return result;
 	}
@@ -316,7 +317,6 @@ public class GameStage {
 	
 	public static void swapTiles(Tile clicked){
 		Collections.swap(tiles, zeroIndex, clicked.index);
-//		System.out.println("Swapped indexes: " + zeroIndex + " " + clicked.index);
 		int temp = zeroIndex;
 		zeroIndex = clicked.index;
 		clicked.index = temp;
@@ -335,31 +335,30 @@ public class GameStage {
 		}
 		if (current.equals(WIN_CONDITION)){
 			gameDone = true;
-			System.out.println("\n>>>>>>> YOU WIN! <<<<<<<<");
+			System.out.println("\n>>>>>>> PUZZLE SOLVED! <<<<<<<<");
 			root.getChildren().remove(board);
 			root.getChildren().addAll(win_imgView);
 			modeSelect.setDisable(true);
 			solution_imgView.setImage(exit_btn);
 			solution_imgView.setOnMouseClicked(event -> {System.exit(0);});
-			showMessage("Puzzle solved!");
+			
+			if(!(mode == "--")) showMessage("Puzzle solved!\nPath cost: " + PathCost(path));
+			else showMessage("Puzzle solved!");
 		}
 	}
 	
 //	Checks if the input configuration is solvable by counting inversions
-	@SuppressWarnings("unchecked")
 	private void checkIfSolvable(){
 		int inversions = 0;
 		
 		for(int i=1; i< MAX_CELLS; i++) {
 			for(int j=0; j<i; j++) {
 				if (input.get(i) != 0 && input.get(j)!= 0 && input.get(j)>input.get(i)) {
-					//System.out.println("inversion: " + input.get(j) + " > " + input.get(i));
 					inversions++;
 				}
 			}
 		}
 		
-		//System.out.println("= "+ inversions + " inversions");
 		if (inversions%2 == 0) System.out.println("Solvable.");
 		else {
 			System.out.println("Not solvable.");
@@ -373,7 +372,9 @@ public class GameStage {
 		Alert popup = new Alert(AlertType.NONE);
 		popup.setTitle("Message");
 		popup.setHeaderText(null);
-		popup.setContentText(message);
+		Label label = new Label(message);
+		label.setWrapText(true);
+		popup.getDialogPane().setContent(label);
 		popup.getDialogPane().getButtonTypes().add(ButtonType.OK);
 		((Stage) popup.getDialogPane().getScene().getWindow()).getIcons().add(new Image("assets/icon.png"));
 		popup.showAndWait();
