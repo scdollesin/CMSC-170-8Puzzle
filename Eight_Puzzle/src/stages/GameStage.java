@@ -27,6 +27,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
 import javafx.scene.control.Label;
 
 public class GameStage {
@@ -38,6 +39,7 @@ public class GameStage {
     private static GridPane board;
 	private static ArrayList<Tile> tiles;
 	private ArrayList<Integer> input;
+	private static String filename;
 	public static int zeroIndex;
 	public static final ArrayList<Integer> WIN_CONDITION = new ArrayList<Integer>(Arrays.asList(1,2,3,4,5,6,7,8,0));
 	public static final HashMap<Integer, List<Integer>> CLICKABLES = new HashMap<Integer, List<Integer>>();
@@ -71,7 +73,7 @@ public class GameStage {
 	private final static Image exit_btn = new Image("assets/exit_btn.png",BOARD_WIDTH/3.5,BOARD_HEIGHT/8.5,false,false);
 	private final static ImageView solution_imgView = new ImageView(solution_btn);
 	
-	public GameStage(ArrayList<Integer> input) {
+	public GameStage(ArrayList<Integer> input, String filename) {
 		root = new Group();
 		this.scene = new Scene(root, GameStage.WINDOW_WIDTH,GameStage.WINDOW_HEIGHT,Color.WHITE);
 		this.canvas = new Canvas(GameStage.WINDOW_WIDTH,GameStage.WINDOW_HEIGHT);
@@ -79,6 +81,7 @@ public class GameStage {
 		board = new GridPane();
 		tiles = new ArrayList<Tile>();
 		this.input = input;
+		this.filename = filename;
 		GameStage.mode = "--";
 		GameStage.modeSelect = new ChoiceBox<String>();
 		
@@ -105,6 +108,18 @@ public class GameStage {
 		win_imgView.setPreserveRatio(true);
 		win_imgView.setFitWidth(GameStage.BOARD_WIDTH);
 		win_imgView.setFitHeight(GameStage.BOARD_HEIGHT);
+		
+		Label inputConf = new Label("INPUT FILE: ");
+		inputConf.setLayoutX(GameStage.BOARD_WIDTH*0.072);
+		inputConf.setLayoutY(GameStage.BOARD_WIDTH + 120);
+		inputConf.setTextFill(Color.WHITE);
+		inputConf.setFont(Font.loadFont("file:DOGICA.TTF", 10));
+		
+		Label fname = new Label(filename);
+		fname.setLayoutX(GameStage.BOARD_WIDTH*0.072 + 115);
+		fname.setLayoutY(GameStage.BOARD_WIDTH + 120);
+		fname.setTextFill(Color.web("ADF588"));
+		fname.setFont(Font.loadFont("file:DOGICA.TTF", 10));
 		
 		HBox solution_hb = new HBox();
 		modeSelect.getItems().addAll("--", "Breadth First Search (BFS)", "Depth First Search (DFS)");
@@ -140,12 +155,12 @@ public class GameStage {
 		
 		solution_hb.getChildren().addAll(modeSelect, solution_imgView);
 		solution_hb.setLayoutX(GameStage.BOARD_WIDTH*0.072);
-		solution_hb.setLayoutY(GameStage.BOARD_WIDTH + 120);
+		solution_hb.setLayoutY(GameStage.BOARD_WIDTH + 145);
 		solution_hb.setSpacing(20);
 		
 		this.gc.drawImage(this.bg, 0, 0);
 		this.createBoard();
-		root.getChildren().addAll(canvas, solution_hb, board);
+		root.getChildren().addAll(canvas, solution_hb, board,inputConf, fname);
 	}
 	
 	private void writeSolution(ArrayList<Integer> path){
@@ -231,7 +246,7 @@ public class GameStage {
 				ArrayList<ArrayList<Integer>> currentState = frontier.pop();
 				
 				
-				while(explored.contains(currentState.get(0))) {currentState = frontier.pop();}	//make sure that the current state hasnt been explored yet
+				while(explored.contains(currentState.get(0))) {System.out.println("explored"); currentState = frontier.pop();}	//make sure that the current state hasnt been explored yet
 			    
 				if(GoalTest(currentState)) {
 					final long endTime = System.nanoTime();
